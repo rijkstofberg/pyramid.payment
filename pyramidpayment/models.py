@@ -1,5 +1,6 @@
 from sqlalchemy import (
     Column,
+    Sequence,
     Integer,
     Text,
     )
@@ -17,12 +18,17 @@ DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
 
-class MyModel(Base):
-    __tablename__ = 'models'
-    id = Column(Integer, primary_key=True)
-    name = Column(Text, unique=True)
+class Order(Base):
+    __tablename__ = 'order'
+    id = Column(Integer,
+                Sequence('order_seq_id', optional=True),
+                primary_key=True,
+               )
+    order_number = Column(Text, unique=True)
     value = Column(Integer)
+    status = Column(Text)
 
-    def __init__(self, name, value):
-        self.name = name
+    def __init__(self, order_number, value):
+        self.order_number = order_number
         self.value = value
+        self.status = 'ordered'

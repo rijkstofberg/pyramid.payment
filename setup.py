@@ -14,6 +14,7 @@ requires = [
     'pyramid_debugtoolbar',
     'zope.sqlalchemy',
     'waitress',
+    'deform',
     ]
 
 setup(name='pyramid.payment',
@@ -40,5 +41,6 @@ setup(name='pyramid.payment',
       main = pyramidpayment:main
       [console_scripts]
       initialize_pyramid.payment_db = pyramidpayment.scripts.initializedb:main
+      add_demo_data = pyramidpayment.scripts.add_demo_data:main
       """,
       )

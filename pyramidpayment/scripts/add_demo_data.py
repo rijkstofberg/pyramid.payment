@@ -11,9 +11,8 @@ from pyramid.paster import (
 
 from ..models import (
     DBSession,
-    Base,
+    Order,
     )
-
 
 def usage(argv):
     cmd = os.path.basename(argv[0])
@@ -30,4 +29,8 @@ def main(argv=sys.argv):
     settings = get_appsettings(config_uri)
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
-    Base.metadata.create_all(engine)
+    with transaction.manager:
+        order = Order('order_0001', 1)
+        DBSession.add(order)
+    orders = DBSession.query(Order).all()
+    print len(orders)

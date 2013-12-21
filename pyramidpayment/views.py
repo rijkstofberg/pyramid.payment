@@ -1,23 +1,21 @@
 from pyramid.response import Response
 from pyramid.view import view_config
 
+import colander
+from deform import Form, ValidationFailure
+from deform import widget as widgets
+
 from sqlalchemy.exc import DBAPIError
 
 from .models import (
     DBSession,
-    MyModel,
+    Order,
     )
 
 
-@view_config(route_name='home', renderer='templates/mytemplate.pt')
-def my_view(request):
-    try:
-        one = DBSession.query(MyModel).filter(MyModel.name == 'one').first()
-    except DBAPIError:
-        return Response(conn_err_msg, content_type='text/plain', status_int=500)
-    return {'one': one, 'project': 'pyramid.payment'}
+PAYU_RPP_URL = ''
 
-conn_err_msg = """\
+CONN_ERR_MSG = """\
 Pyramid is having a problem using your SQL database.  The problem
 might be caused by one of the following things:
 
@@ -33,3 +31,34 @@ After you fix the problem, please restart the Pyramid application to
 try it again.
 """
 
+@view_config(route_name='home', renderer='templates/home.pt')
+def home_view(request):
+    try:
+        one = DBSession.query(Order).filter(Order.order_number == 'order_0001').first()
+    except DBAPIError:
+        return Response(CONN_ERR_MSG, content_type='text/plain', status_int=500)
+    return {}
+
+
+@view_config(route_name='list_orders', renderer='templates/list_orders.pt')
+def list_orders_view(request):
+    orders = DBSession.query(Order).all()
+    return {'orders': orders}
+
+
+class OrderSchema(colander.MappingSchema):
+    order_number = colander.SchemaNode(colander.String())
+    value = colander.SchemaNode(colander.String())
+
+
+@view_config(route_name='order', renderer='templates/order.pt')
+def order_view(request):
+    if request.get('submitted', False):
+        order = Order('order_0002', 2)
+        return request.response.redirect(PAYU_RPP_URL)
+
+    schema = OrderSchema()
+    form = Form(schema,
+                css_class='vertical_form',
+                buttons=('submit',))
+    return {'form': form.render()}
