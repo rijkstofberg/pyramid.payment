@@ -30,7 +30,8 @@ def main(argv=sys.argv):
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     with transaction.manager:
-        order = Order('order_0001', 1)
-        DBSession.add(order)
+        for i in range(0,10):
+            order = Order('exref_%s' % i, 1)
+            DBSession.add(order)
     orders = DBSession.query(Order).all()
     print len(orders)
