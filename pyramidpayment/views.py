@@ -1,5 +1,7 @@
-from pyramid.response import Response
+import transaction
 from pyramid.view import view_config
+from pyramid.response import Response
+from pyramid.httpexceptions import HTTPFound
 
 import colander
 from deform import Form, ValidationFailure
@@ -14,6 +16,7 @@ from .models import (
 
 
 PAYU_RPP_URL = ''
+PAYU_WDSL_URL = 'https://staging.payu.co.za/service/PayUAPI?wsdl'
 
 CONN_ERR_MSG = """\
 Pyramid is having a problem using your SQL database.  The problem
@@ -47,18 +50,23 @@ def list_orders_view(request):
 
 
 class OrderSchema(colander.MappingSchema):
-    order_number = colander.SchemaNode(colander.String())
     value = colander.SchemaNode(colander.String())
 
 
 @view_config(route_name='order', renderer='templates/order.pt')
 def order_view(request):
-    if request.get('submitted', False):
-        order = Order('order_0002', 2)
-        return request.response.redirect(PAYU_RPP_URL)
-
+    import pdb;pdb.set_trace()
     schema = OrderSchema()
     form = Form(schema,
                 css_class='vertical_form',
                 buttons=('submit',))
-    return {'form': form.render()}
+
+    if 'submit' in request.POST:
+        controls = request.POST.items()
+        appstruct = form.validate(controls)
+        return HTTPFound(PAYU_RPP_URL)
+    else:
+        order = Order()
+        appstruct = order.as_dict()
+        return {'form': form.render(appstruct),
+                'order': order}

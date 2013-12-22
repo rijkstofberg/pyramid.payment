@@ -33,13 +33,15 @@
                         <thead>
                             <tr>
                                 <th>Order number</th>
+                                <th>External reference number</th>
                                 <th>Value</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr tal:repeat="order orders">
-                                <td><span tal:replace="order.order_number">9999</span></td>
+                                <td><span tal:replace="order.formatted_order_number()">9999</span></td>
+                                <td><span tal:replace="order.external_reference_number">9999</span></td>
                                 <td><span tal:replace="order.value">999.99</span></td>
                                 <td><span tal:replace="order.status">ordered</span></td>
                             </tr>
