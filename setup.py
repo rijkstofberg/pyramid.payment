@@ -15,6 +15,7 @@ requires = [
     'zope.sqlalchemy',
     'waitress',
     'deform',
+    'paymentintegrations',
     ]
 
 setup(name='pyramid.payment',
