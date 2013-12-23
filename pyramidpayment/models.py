@@ -50,8 +50,8 @@ class Order(Base):
         )
 
     @classmethod
-    def by_order_number(self, order_number):
-        order = DBSession.query(Order).filter(Order.order_number == order_number)
+    def by_id(self, id):
+        order = DBSession.query(Order).filter(Order.id == id)
         return order.first()
 
     @classmethod
