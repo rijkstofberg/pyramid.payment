@@ -37,7 +37,7 @@ try it again.
 @view_config(route_name='home', renderer='templates/home.pt')
 def home_view(request):
     try:
-        one = DBSession.query(Order).filter(Order.order_number == 'order_0001').first()
+        one = DBSession.query(Order).filter(Order.id == 1).first()
     except DBAPIError:
         return Response(CONN_ERR_MSG, content_type='text/plain', status_int=500)
     return {}
