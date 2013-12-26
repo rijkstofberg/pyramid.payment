@@ -2,9 +2,12 @@ import os
 
 from setuptools import setup, find_packages
 
+version='0.1',
+
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.md')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.md')).read()
+LICENSE = open(os.path.join(here, 'LICENSE.md')).read()
 
 requires = [
     'pyramid',
@@ -19,7 +22,7 @@ requires = [
     ]
 
 setup(name='pyramid.payment',
-      version='0.0',
+      version=version,
       description='pyramid.payment',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
@@ -28,9 +31,10 @@ setup(name='pyramid.payment',
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         ],
-      author='',
-      author_email='',
+      author='Rijk Stofberg',
+      author_email='rijk.stofberg@gmail.com',
       url='',
+      license=LICENSE,
       keywords='web wsgi bfg pylons pyramid',
       packages=find_packages(),
       include_package_data=True,
