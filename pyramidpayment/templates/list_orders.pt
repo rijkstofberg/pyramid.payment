@@ -17,7 +17,9 @@
         <div id="wrap">
             <div id="top">
                 <div class="top align-center">
-                    <div><img src="${request.static_url('pyramidpayment:static/pyramid.png')}" width="750" height="169" alt="pyramid"/></div>
+                  <a href="/">
+                      <img src="${request.static_url('pyramidpayment:static/pyramid.png')}" width="750" height="169" alt="pyramid"/>
+                  </a>
                 </div>
             </div>
             <div id="middle">
