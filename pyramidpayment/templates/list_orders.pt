@@ -51,7 +51,7 @@
                                 </span>
                                 </td>
                                 <td><span tal:replace="order.external_reference_number">9999</span></td>
-                                <td><span tal:replace="order.value">999.99</span></td>
+                                <td><span tal:replace="order.format_value()">999.99</span></td>
                                 <td><span tal:replace="order.status">ordered</span></td>
                             </tr>
                         </tbody>
