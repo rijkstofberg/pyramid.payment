@@ -31,7 +31,9 @@
             </div>
             <div id="bottom">
                 <div class="bottom">
-                    Payment cancelled
+                    Payment cancelled for order:<br/>
+                    Description: <span tal:content="order.description">product description</span><br/>
+                    Value: <span tal:content="order.value">product price</span>
                 </div>
             </div>
         </div>
