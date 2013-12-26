@@ -11,4 +11,3 @@ Getting Started
 - $venv/bin/initialize_pyramid.payment_db development.ini
 
 - $venv/bin/pserve development.ini
-
