@@ -30,8 +30,9 @@
       </div>
     </div>
     <div id="bottom">
-        <div tal:condition="order"
-            tal:content="structure form">form</div>
+        <div tal:condition="order" tal:content="structure form">
+            order form
+        </div>
 
         <ul tal:condition="not:order">
             <li tal:repeat="product view.products()">
