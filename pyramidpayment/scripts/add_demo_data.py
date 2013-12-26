@@ -40,7 +40,19 @@ from pyramid.paster import (
 from ..models import (
     DBSession,
     Order,
+    Product,
     )
+
+
+DEMO_PRODUCTS = (
+    ('Product 1', 1000),
+    ('Product 2', 2000),
+    ('Product 3', 3000),
+    ('Product 4', 4000),
+    ('Product 5', 5000),
+    ('Product 6', 6000),
+)
+
 
 def usage(argv):
     cmd = os.path.basename(argv[0])
@@ -63,3 +75,10 @@ def main(argv=sys.argv):
             DBSession.add(order)
     orders = DBSession.query(Order).all()
     print len(orders)
+
+    with transaction.manager:
+        for description, price in DEMO_PRODUCTS:
+            product = Product(description, price)
+            DBSession.add(product)
+    products = DBSession.query(Product).all()
+    print len(products)
