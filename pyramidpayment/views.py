@@ -48,7 +48,6 @@ from .models import (
 
 from paymentintegrations.processors import PayUProcessor
 
-PAYU_RPP_URL = 'https://staging.payu.co.za/rpp.do'
 SUCCESS = 200
 returnUrl = 'http://localhost:8080/payment-processed',
 cancelUrl = 'http://localhost:8080/payment-cancelled',
@@ -145,22 +144,27 @@ def confirm_view(request):
     message = ''
     order = Order.by_id(int(request.params['order_id']))
     if 'pay_now' in  request.POST:
-        processor = PayUProcessor(details = configDetails(order))
+        settings = request.registry.settings
+        processor = PayUProcessor(details = configDetails(order, settings))
         resultCode, resultObj = processor.setTransaction()
         if resultCode == SUCCESS:
             order.external_reference_number = resultObj.payUReference
-            url = PAYU_RPP_URL + '?PayUReference=%s' % resultObj.payUReference
+            payu_RPP_URL = settings.get('payu_RPP_URL')
+            url = payu_RPP_URL + '?PayUReference=%s' % resultObj.payUReference
             message = resultObj.__repr__()
             return HTTPFound(url)
     return {'order': order,
             'message': message}
 
-def configDetails(order):
+def configDetails(order, settings):
+    """ Look in ./etc for the relevant .ini.in file.  It declares a lot of the
+        settings used below.
+    """
     return dict(
         transactionType       = 'PAYMENT',
-        username              = 'Staging Integration Store 1',
-        password              = '78cXrW1W',
-        safekey               = '{45D5C765-16D2-45A4-8C41-8D6F84042F8C}',
+        username              = settings.get('username'),
+        password              = settings.get('password'),
+        safekey               = settings.get('safekey'),
         basket                = dict(
                                   description = order.description,
                                   amountInCents = order.value,
@@ -168,8 +172,8 @@ def configDetails(order):
                                   ),
         additionalInformation = dict(
                                   merchantReference = order.id,
-                                  returnUrl = returnUrl,
-                                  cancelUrl = cancelUrl,
+                                  returnUrl = settings.get('returnUrl'),
+                                  cancelUrl = settings.get('cancelUrl'),
                                   supportedPaymentMethods = 'CREDITCARD',
                                   ),
         customer              = dict(
