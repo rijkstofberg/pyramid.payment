@@ -53,7 +53,7 @@ class Order(Base):
                 primary_key=True,)
     description = Column(Text)
     value = Column(Integer)
-    external_reference_number = Column(Text)
+    external_reference_number = Column(Text, unique=True)
     status = Column(Text)
 
     def __init__(self, description, value, external_reference_number=''):
@@ -76,14 +76,24 @@ class Order(Base):
         return dict(
             description = self.description,
             value = self.value, 
+            display_value = self.format_value(),
             order_number = self.formatted_order_number(),
             external_reference_number = self.external_reference_number,
         )
+
+    def format_value(self):
+        return 'R {0:0.2f}'.format(self.value/100.00) 
 
     @classmethod
     def by_id(self, id):
         order = DBSession.query(Order).filter(Order.id == id)
         return order.first()
+
+    @classmethod
+    def by_external_reference_number(self, external_reference_number):
+        orders = DBSession.query(Order).filter(
+            Order.external_reference_number == external_reference_number)
+        return orders.first()
 
     @classmethod
     def next_order_number(self, order_number):
@@ -110,4 +120,3 @@ class Product(Base):
     def by_id(self, id):
         order = DBSession.query(Product).filter(Order.id == id)
         return order.first()
-
