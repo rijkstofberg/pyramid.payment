@@ -34,8 +34,13 @@
         You have ordered:
         <span tal:content="order.description">description</span>
         @
-        <span tal:content="order.value">value</span>
-        <form name="" method="POST" action="." tal:attributes="action python:request.route_url('confirm')">
+        <span tal:content="order.format_value()">value</span>
+        <div tal:condition="order.status == 'paid'">
+            This order has been paid for.
+        </div>
+        <form name="" method="POST" action="." 
+            tal:condition="order.status != 'paid'"
+            tal:attributes="action python:request.route_url('confirm')">
             Click here to pay through PayU
             <input type="hidden" name="order_id" value="" tal:attributes="value request.params.order_id" />
            <button value="pay_now" class="btnText submit" type="submit" name="pay_now" id="pay_now">
