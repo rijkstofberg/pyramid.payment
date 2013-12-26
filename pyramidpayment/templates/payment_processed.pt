@@ -33,7 +33,7 @@
                 <div class="bottom">
                     Payment processed successfully for order:<br/>
                     Description: <span tal:content="order.description">product description</span><br/>
-                    Value: <span tal:content="order.value">product price</span>
+                    Value: <span tal:content="order.format_value()">product price</span>
                 </div>
             </div>
         </div>
