@@ -49,8 +49,6 @@ from .models import (
 from paymentintegrations.processors import PayUProcessor
 
 SUCCESS = 200
-returnUrl = 'http://localhost:8080/payment-processed',
-cancelUrl = 'http://localhost:8080/payment-cancelled',
 
 CONN_ERR_MSG = """\
 Pyramid is having a problem using your SQL database.  The problem
@@ -70,6 +68,8 @@ try it again.
 
 @view_config(route_name='home', renderer='templates/home.pt')
 def home_view(request):
+    """ The root of the application. The first page most users see.
+    """
     try:
         one = DBSession.query(Order).filter(Order.id == 1).first()
     except DBAPIError:
@@ -79,11 +79,15 @@ def home_view(request):
 
 @view_config(route_name='list_orders', renderer='templates/list_orders.pt')
 def list_orders_view(request):
+    """ List all order in the system.
+    """
     orders = DBSession.query(Order).all()
     return {'orders': orders}
 
 
 class OrderSchema(colander.MappingSchema):
+    """ Defines what a order looks like, data wise.
+    """
     description = colander.SchemaNode(colander.String())
     value = colander.SchemaNode(
         colander.String(),
@@ -97,6 +101,9 @@ class OrderSchema(colander.MappingSchema):
 
 
 class OrderView(object):
+    """ Facilitates the selection of product and the initiating of a PayU
+        payment transaction.
+    """
 
     def __init__(self, context, request):
         self.context = context
@@ -136,11 +143,16 @@ class OrderView(object):
         return {}
 
     def products(self):
+        """ Utility method used by the template to render all orders.
+        """
         return DBSession.query(Product).all()
 
 
 @view_config(route_name='confirm', renderer='templates/confirm.pt')
 def confirm_view(request):
+    """ Helps the user confirm the selected product and move to the payment
+        step.
+    """
     message = ''
     order = Order.by_id(int(request.params['order_id']))
     if 'pay_now' in  request.POST:
@@ -159,6 +171,8 @@ def confirm_view(request):
 def configDetails(order, settings):
     """ Look in ./etc for the relevant .ini.in file.  It declares a lot of the
         settings used below.
+        This method helps us build the settings necessary to speak to the 
+        PayU payment webservice.
     """
     return dict(
         transactionType       = 'PAYMENT',
@@ -192,6 +206,10 @@ def configDetails(order, settings):
 
 @view_config(route_name='payment-processed', renderer='templates/payment_processed.pt')
 def payment_processed_view(request):
+    """ Used as callback view for PayU to tell the user what happened during
+        the payment process.
+        This view also puts the order in the 'paid' state.
+    """
     ext_ref = request.params.get('payUReference',
               request.params.get('PayUReference'))
     order = Order.by_external_reference_number(ext_ref)
@@ -201,6 +219,9 @@ def payment_processed_view(request):
 
 @view_config(route_name='payment-cancelled', renderer='templates/payment_cancelled.pt')
 def payment_cancelled_view(request):
+    """ PayU redirects here if the user cancels the payment process.
+        This view also puts the order in the 'cancelled' state.
+    """
     ext_ref = request.params.get('payUReference',
               request.params.get('PayUReference'))
     order = Order.by_external_reference_number(ext_ref)

@@ -47,6 +47,9 @@ Base = declarative_base()
 
 
 class Order(Base):
+    """ Models a basic order and supplies utility methods for find orders by
+        id and external reference number.
+    """
     __tablename__ = 'order'
     id = Column(Integer,
                 Sequence('order_seq_id', optional=True),
@@ -73,6 +76,8 @@ class Order(Base):
         return 'order_{id:04}'.format(id=self.id)
     
     def as_dict(self):
+        """ Marshal the order as a dictionary for use in our transactions.
+        """
         return dict(
             description = self.description,
             value = self.value, 
@@ -82,26 +87,37 @@ class Order(Base):
         )
 
     def format_value(self):
+        """ Format the value as a Rand value with 2 places after the decimal
+            point.
+        """
         return 'R {0:0.2f}'.format(self.value/100.00) 
 
     @classmethod
     def by_id(self, id):
+        """ Utility method for finding an order by its internal id.
+        """
         order = DBSession.query(Order).filter(Order.id == id)
         return order.first()
 
     @classmethod
     def by_external_reference_number(self, external_reference_number):
+        """ Utility method for finding an order by its external id.
+        """
         orders = DBSession.query(Order).filter(
             Order.external_reference_number == external_reference_number)
         return orders.first()
 
     @classmethod
     def next_order_number(self, order_number):
+        """ Get the next sequential order number.
+        """
         results = DBSession.execute('select max("id") from "order"')
         return results.first()[0] +1
 
 
 class Product(Base):
+    """ Model a basic product to use on the order user interface.
+    """
     __tablename__ = 'product'
     id = Column(Integer,
                 Sequence('product_seq_id', optional=True),
@@ -114,9 +130,14 @@ class Product(Base):
         self.price = price
 
     def format_price(self):
+        """ Format the price as a Rand value with 2 places after the decimal
+            point.
+        """
         return 'R {0:0.2f}'.format(self.price/100.00) 
 
     @classmethod
     def by_id(self, id):
+        """ Utility method to find the product by its unique id.
+        """
         order = DBSession.query(Product).filter(Product.id == id)
         return order.first()

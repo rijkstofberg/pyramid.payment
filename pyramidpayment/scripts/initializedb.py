@@ -26,6 +26,9 @@
 #
 ##############################################################################
 
+""" Create the basic database structure.
+"""
+
 import os
 import sys
 import transaction

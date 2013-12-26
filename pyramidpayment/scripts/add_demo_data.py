@@ -26,6 +26,9 @@
 #
 ##############################################################################
 
+""" Add some demo data and a couple of products to test against. 
+"""
+
 import os
 import sys
 import transaction
