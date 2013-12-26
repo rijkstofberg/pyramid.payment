@@ -40,7 +40,14 @@
                         </thead>
                         <tbody>
                             <tr tal:repeat="order orders">
-                                <td><span tal:replace="order.formatted_order_number()">9999</span></td>
+                                <td>
+                                    <span>
+                                        <a href="#" tal:attributes="href string:/confirm?order_id=${order.id}"
+                                            tal:content="order.formatted_order_number()">
+                                            9999
+                                        </a>
+                                </span>
+                                </td>
                                 <td><span tal:replace="order.external_reference_number">9999</span></td>
                                 <td><span tal:replace="order.value">999.99</span></td>
                                 <td><span tal:replace="order.status">ordered</span></td>
