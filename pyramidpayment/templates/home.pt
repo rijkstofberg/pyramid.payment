@@ -29,7 +29,9 @@
             </div>
             <div id="bottom">
                 <div class="bottom">
-                    <a href="/order">Start order process</a>
+                    <a href="/order">Start order process</a><br/>
+
+                    <a href="/list_orders">View all current orders</a>
                 </div>
             </div>
         </div>
