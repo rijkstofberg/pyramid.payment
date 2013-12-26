@@ -89,3 +89,25 @@ class Order(Base):
     def next_order_number(self, order_number):
         results = DBSession.execute('select max("id") from "order"')
         return results.first()[0] +1
+
+
+class Product(Base):
+    __tablename__ = 'product'
+    id = Column(Integer,
+                Sequence('product_seq_id', optional=True),
+                primary_key=True,)
+    description = Column(Text)
+    price = Column(Integer)
+
+    def __init__(self, description, price):
+        self.description = description
+        self.price = price
+
+    def format_price(self):
+        return 'R {0:0.2f}'.format(self.price/100.00) 
+
+    @classmethod
+    def by_id(self, id):
+        order = DBSession.query(Product).filter(Order.id == id)
+        return order.first()
+
