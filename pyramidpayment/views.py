@@ -43,6 +43,7 @@ from sqlalchemy.exc import DBAPIError
 from .models import (
     DBSession,
     Order,
+    Product,
     )
 
 from paymentintegrations.processors import PayUProcessor
@@ -88,34 +89,46 @@ class OrderSchema(colander.MappingSchema):
     value = colander.SchemaNode(colander.String())
 
 
-@view_config(route_name='order', renderer='templates/order.pt')
-def order_view(request):
-    schema = OrderSchema()
-    form = Form(schema,
-                css_class='vertical_form',
-                buttons=('Place order',))
+class OrderView(object):
 
-    if 'Place_order' in request.POST:
-        order = Order(
-            description = request.POST['description'],
-            value = request.POST['value']
-        )
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
 
-        controls = request.POST.items()
-        try:
-            appstruct = form.validate(controls)
-            DBSession.add(order)
-            DBSession.flush()
-            url = request.route_url('confirm')
-            url = url + '?order_id=%s' % order.id
-            return HTTPFound(location = url)
-        except ValidationFailure:
+    @view_config(route_name='order', renderer='templates/order.pt')
+    def order_view(self):
+        schema = OrderSchema()
+        form = Form(schema,
+                    css_class='vertical_form',
+                    buttons=('Confirm order',))
+
+        if 'Confirm_order' in self.request.POST:
+            order = Order(
+                description = self.request.POST['description'],
+                value = self.request.POST['value']
+            )
+
+            controls = self.request.POST.items()
+            try:
+                appstruct = form.validate(controls)
+                DBSession.add(order)
+                DBSession.flush()
+                url = self.request.route_url('confirm')
+                url = url + '?order_id=%s' % order.id
+                return HTTPFound(location = url)
+            except ValidationFailure:
+                appstruct = order.as_dict()
+                return {'form': form.render(appstruct)}
+        elif 'product_id' in self.request.params:
+            product = Product.by_id(int(self.request.params.get('product_id')))
+            order = Order(product.description, product.format_price())
             appstruct = order.as_dict()
-            return {'form': form.render(appstruct)}
-    else:
-        order = Order('', 0)
-        appstruct = order.as_dict()
-        return {'form': form.render(appstruct)}
+            return {'form': form.render(appstruct),
+                    'order': order}
+        return {}
+
+    def products(self):
+        return DBSession.query(Product).all()
 
 
 @view_config(route_name='confirm', renderer='templates/confirm.pt')
