@@ -13,11 +13,13 @@
   <link rel="stylesheet" href="${request.static_url('pyramidpayment:static/ie6.css')}" type="text/css" media="screen" charset="utf-8" />
   <![endif]-->
 </head>
-<body>
+<body tal:define="order order|nothing">
   <div id="wrap">
     <div id="top">
-      <div class="top align-center">
-        <div><img src="${request.static_url('pyramidpayment:static/pyramid.png')}" width="750" height="169" alt="pyramid"/></div>
+        <div class="top align-center">
+            <a href="/">
+                <img src="${request.static_url('pyramidpayment:static/pyramid.png')}" width="750" height="169" alt="pyramid"/>
+            </a>
       </div>
     </div>
     <div id="middle">
@@ -28,9 +30,18 @@
       </div>
     </div>
     <div id="bottom">
-      <div class="bottom">
-        <div tal:content="structure form">form</div>
-      </div>
+        <div tal:condition="order"
+            tal:content="structure form">form</div>
+
+        <ul tal:condition="not:order">
+            <li tal:repeat="product view.products()">
+                <a href="order?product_id="
+                    tal:attributes="href string:order?product_id=${product.id}">
+                    <span tal:replace="product.description">Product 1</span> @ 
+                    <span tal:replace="product.format_price()">R10</span>
+                </a>
+            </li>
+        </ul>
     </div>
   </div>
   <div id="footer">
