@@ -118,5 +118,5 @@ class Product(Base):
 
     @classmethod
     def by_id(self, id):
-        order = DBSession.query(Product).filter(Order.id == id)
+        order = DBSession.query(Product).filter(Product.id == id)
         return order.first()
