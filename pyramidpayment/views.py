@@ -188,8 +188,9 @@ def configDetails(order):
 
 @view_config(route_name='payment-processed', renderer='templates/payment_processed.pt')
 def payment_processed_view(request):
-    order = Order.by_external_reference_number(
-        request.params.get('PayUReference'))
+    ext_ref = request.params.get('payUReference',
+              request.params.get('PayUReference'))
+    order = Order.by_external_reference_number(ext_ref)
     order.status = 'paid'
     return {'order': order}
 
