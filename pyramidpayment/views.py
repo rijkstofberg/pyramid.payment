@@ -47,8 +47,10 @@ from .models import (
 
 from paymentintegrations.processors import PayUProcessor
 
-PAYU_RPP_URL = ''
-SUCCESS = 1
+PAYU_RPP_URL = 'https://staging.payu.co.za/rpp.do'
+SUCCESS = 200
+returnUrl = 'http://localhost:8080/payment-processed',
+cancelUrl = 'http://localhost:8080/payment-cancelled',
 
 CONN_ERR_MSG = """\
 Pyramid is having a problem using your SQL database.  The problem
@@ -122,9 +124,11 @@ def confirm_view(request):
     order = Order.by_id(int(request.params['order_id']))
     if 'pay_now' in  request.POST:
         processor = PayUProcessor(details = configDetails(order))
-        result = processor.setTransaction()
-        if result == SUCCESS:
-            url = PAYU_RPP_URL + '?order_id=%s' % order.id
+        resultCode, resultObj = processor.setTransaction()
+        if resultCode == SUCCESS:
+            order.external_reference_number = resultObj.payUReference
+            url = PAYU_RPP_URL + '?PayUReference=%s' % resultObj.payUReference
+            message = resultObj.__repr__()
             return HTTPFound(url)
     return {'order': order,
             'message': message}
@@ -142,8 +146,8 @@ def configDetails(order):
                                   ),
         additionalInformation = dict(
                                   merchantReference = order.id,
-                                  returnUrl = 'http://example.com/return-url',
-                                  cancelUrl = 'http://example.com/cancel-url',
+                                  returnUrl = returnUrl,
+                                  cancelUrl = cancelUrl,
                                   supportedPaymentMethods = 'CREDITCARD',
                                   ),
         customer              = dict(
@@ -158,3 +162,13 @@ def configDetails(order):
         schema_log_lvl        = logging.DEBUG,
         wsdl_log_lvl          = logging.DEBUG,
     )
+
+
+@view_config(route_name='payment-processed', renderer='templates/payment_processed.pt')
+def payment_processed_view(request):
+    return {}
+
+
+@view_config(route_name='payment-cancelled', renderer='templates/payment_cancelled.pt')
+def payment_cancelled_view(request):
+    return {}

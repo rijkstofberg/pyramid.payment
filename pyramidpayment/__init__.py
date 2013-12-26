@@ -19,5 +19,7 @@ def main(global_config, **settings):
     config.add_route('order', '/order')
     config.add_route('confirm', '/confirm')
     config.add_route('list_orders', '/list_orders')
+    config.add_route('payment-processed', '/payment-processed')
+    config.add_route('payment-cancelled', '/payment-cancelled')
     config.scan()
     return config.make_wsgi_app()
