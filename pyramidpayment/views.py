@@ -86,7 +86,15 @@ def list_orders_view(request):
 
 class OrderSchema(colander.MappingSchema):
     description = colander.SchemaNode(colander.String())
-    value = colander.SchemaNode(colander.String())
+    value = colander.SchemaNode(
+        colander.String(),
+        widget = widgets.HiddenWidget()
+    )
+    display_value = colander.SchemaNode(
+        colander.String(),
+        missing= '',
+        widget = widgets.TextInputWidget(readonly = True)
+    )
 
 
 class OrderView(object):
@@ -121,7 +129,8 @@ class OrderView(object):
                 return {'form': form.render(appstruct)}
         elif 'product_id' in self.request.params:
             product = Product.by_id(int(self.request.params.get('product_id')))
-            order = Order(product.description, product.format_price())
+            order = Order(product.description, product.price)
+            schema.get('display_value').missing = product.price
             appstruct = order.as_dict()
             return {'form': form.render(appstruct),
                     'order': order}
@@ -153,8 +162,8 @@ def configDetails(order):
         password              = '78cXrW1W',
         safekey               = '{45D5C765-16D2-45A4-8C41-8D6F84042F8C}',
         basket                = dict(
-                                  description = 'Basket description',
-                                  amountInCents = '100',
+                                  description = order.description,
+                                  amountInCents = order.value,
                                   currencyCode = 'ZAR',
                                   ),
         additionalInformation = dict(
@@ -179,9 +188,16 @@ def configDetails(order):
 
 @view_config(route_name='payment-processed', renderer='templates/payment_processed.pt')
 def payment_processed_view(request):
-    return {}
+    order = Order.by_external_reference_number(
+        request.params.get('PayUReference'))
+    order.status = 'paid'
+    return {'order': order}
 
 
 @view_config(route_name='payment-cancelled', renderer='templates/payment_cancelled.pt')
 def payment_cancelled_view(request):
-    return {}
+    ext_ref = request.params.get('payUReference',
+              request.params.get('PayUReference'))
+    order = Order.by_external_reference_number(ext_ref)
+    order.status = 'cancelled'
+    return {'order': order}
