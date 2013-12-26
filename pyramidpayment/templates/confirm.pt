@@ -17,7 +17,9 @@
   <div id="wrap">
     <div id="top">
       <div class="top align-center">
-        <div><img src="${request.static_url('pyramidpayment:static/pyramid.png')}" width="750" height="169" alt="pyramid"/></div>
+          <a href="/">
+              <img src="${request.static_url('pyramidpayment:static/pyramid.png')}" width="750" height="169" alt="pyramid"/>
+          </a>
       </div>
     </div>
     <div id="middle">
@@ -32,7 +34,7 @@
         You have ordered:
         <span tal:content="order.description">description</span>
         @
-        R <span tal:content="order.value">value</span>
+        <span tal:content="order.value">value</span>
         <form name="" method="POST" action="." tal:attributes="action python:request.route_url('confirm')">
             Click here to pay through PayU
             <input type="hidden" name="order_id" value="" tal:attributes="value request.params.order_id" />
