@@ -370,3 +370,17 @@ body:before
   width: 0;
   margin-top: -32767px;
 }
+
+form.vertical_form ul,
+ul.no-bullets {
+    list-style-type: none;
+}
+
+table.listing {
+    text-align: left;
+}
+
+table.listing th, td {
+    border-left: 1px solid black;
+    padding: 5px;
+}
