@@ -34,7 +34,8 @@
             order form
         </div>
 
-        <ul tal:condition="not:order">
+        <ul class="no-bullets" tal:condition="not:order">
+            <li>Select a product:</li>
             <li tal:repeat="product view.products()">
                 <a href="order?product_id="
                     tal:attributes="href string:order?product_id=${product.id}">
